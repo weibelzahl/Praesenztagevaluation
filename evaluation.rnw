@@ -1,0 +1,83 @@
+\documentclass{article}
+\usepackage[german]{babel}
+\usepackage[scaled]{helvet}
+\renewcommand\familydefault{\sfdefault} 
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+%\renewcommand{\familydefault}{\sfdefault}
+\geometry{a4paper, total={210mm,297mm}, left=20mm, right=20mm, top=15mm, tmargin=39mm, headheight=70mm, bottom=20mm}
+\pagestyle{fancy}
+\fancyhead{} 
+\fancyhead[RO,RE]{\includegraphics{img/pfh_logo3.png}}
+\fancyfoot{} 
+\fancyfoot[RO,RE]{\thepage}
+\thispagestyle{fancy}
+
+<<include=FALSE>>=
+# config fake for testing
+#modulname <- "Arbeitspsychologie"
+#inFile <- list()
+#inFile$datapath <- "../survey_278678_R_data_file.csv"
+#inFile$datapath <- "../survey_622293_R_data_file.csv"
+#datum <- "heute"
+#dozent <- "Prof. Vogelzahl"
+#ort <- "Geismar"
+
+@
+
+\begin{document}
+\title{Evaluation des Präsenztags\\ \Sexpr{modulname}
+}
+\date{
+%
+}
+
+\author{}
+\maketitle
+
+\noindent
+Dozent: \Sexpr{dozent}
+
+\noindent
+Ort: \Sexpr{ort}
+
+\noindent
+Datum des Präsenztages: \Sexpr{datum}
+
+\renewcommand*\contentsname{}
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+<<run-all, include=FALSE>>=
+# read data
+
+data <-
+      read.csv(
+        inFile$datapath, quote = "'\"", na.strings = c("", "\"\""), stringsAsFactors =
+          FALSE, encoding = "UTF-8"
+      )
+# label data
+source("generic_evaluation_syntax_file.r", encoding = "UTF-8", local = TRUE)
+
+# select complete answers only
+data <- data[!is.na(data$submitdate),]
+
+# ready to knit
+library(knitr)
+out = NULL
+
+# separate sheets for AlleCampus vs individual programmes etc.
+studiengangsdaten <- data
+
+if(nrow(studiengangsdaten)==0){
+    out = c(out,  knit_child('keineAntworten.rnw'))
+  }else{
+    out = c(out,  knit_child('evaluation_praesenztag.rnw'))
+  }
+
+@
+
+\Sexpr{paste(out, collapse = '\n ')}
+\end{document}
